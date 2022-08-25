@@ -16,20 +16,26 @@ app.get('/', (req, res) => {
 })
 
 app.get('/restaurants/:restaurant_id', (req, res) => {
-  console.log(req.params.restaurant_id)
   const restaurant = restaurantList.results.find(restaurant => restaurant.id.toString() === req.params.restaurant_id)
   res.render('show', { restaurant: restaurant })
 })
 
 app.get('/search', (req, res) => {
-  console.log(req.query.keyword)
-  const keyword = req.query.keyword
+  console.log(req.query)
+  const keyword = req.query.keyword.trim()
+  const searchType = req.query.searchType
   const restaurants = restaurantList.results.filter(restaurants => {
-    return restaurants.name.toLowerCase().includes(keyword.toLowerCase()) ||
-      restaurants.category.toLowerCase().includes(keyword.toLowerCase())
+    if (searchType === 'name') {
+      return restaurants.name.toLowerCase().includes(keyword.toLowerCase())
+    } else if (searchType === 'category') {
+      return restaurants.category.toLowerCase().includes(keyword.toLowerCase())
+    } else if (searchType === 'location') {
+      return restaurants.location.toLowerCase().includes(keyword.toLowerCase())
+    }
+
   })
 
-  res.render('index', { restaurants: restaurants, keyword: keyword })
+  res.render('index', { restaurants: restaurants, keyword: keyword, searchType: searchType })
 })
 app.listen(port, () => {
   console.log(`The express is running on http://localhost:${port}`)
